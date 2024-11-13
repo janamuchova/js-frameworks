@@ -3,36 +3,30 @@ package cz.eg.hr.data;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "FRAMEWORKS")
+@Table(name = "frameworks")
+@SequenceGenerator(name="frameworks_id_seq", initialValue=1)
 public class JavascriptFramework {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="frameworks_id_seq")
     private Long id;
 
-    @Column(name = "NAME", nullable = false, length = 30)
+    @Column(name = "name", nullable = false, length = 30)
     private String name;
 
-    @Column(name = "RATING")
+    @Column(name = "rating")
     private Integer rating;
-
-//    @Column
-//    private Long versionId;
 
     public JavascriptFramework() {
     }
 
-    public JavascriptFramework(String name) {
+    public JavascriptFramework(String name, Integer rating) {
         this.name = name;
+        this.rating = rating;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -53,7 +47,7 @@ public class JavascriptFramework {
 
     @Override
     public String toString() {
-        return "JavaScriptFramework [id=" + id + ", name=" + name + "]";
+        return "JavaScriptFramework [id=" + id + ", name=" + name + ", rating=" + rating + "]";
     }
 
 }
