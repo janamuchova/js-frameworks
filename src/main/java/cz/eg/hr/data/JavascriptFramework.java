@@ -1,6 +1,7 @@
 package cz.eg.hr.data;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "frameworks")
@@ -8,19 +9,35 @@ import jakarta.persistence.*;
 public class JavascriptFramework {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="frameworks_id_seq")
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="frameworks_id_seq")
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 30)
+    /**
+     * The name of the javascript framework
+     */
+    @NotBlank(message = "The name of the javascript framework is required.")
+    @Size(max = 30, message = "The name of the javascript framework must not be longer than 30 characters.")
+    @Column(name = "name", nullable = false, unique = true, length = 30)
     private String name;
 
+    /**
+     * The rating of the javascript framework (1 to 5 stars)
+     */
+    @Min(value = 1, message = "The rating of the javascript framework must be equal or greater than 1.")
+    @Max(value = 5, message = "The rating of the javascript framework must be equal or less than 5.")
     @Column(name = "rating")
-    private Integer rating;
+    private Double rating;
 
     public JavascriptFramework() {
     }
 
-    public JavascriptFramework(String name, Integer rating) {
+    public JavascriptFramework(String name, Double rating) {
+        this.name = name;
+        this.rating = rating;
+    }
+
+    public JavascriptFramework(Long id, String name, Double rating) {
+        this.id = id;
         this.name = name;
         this.rating = rating;
     }
@@ -37,11 +54,11 @@ public class JavascriptFramework {
         this.name = name;
     }
 
-    public Integer getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 

@@ -1,14 +1,14 @@
 package cz.eg.hr.repository;
 
-import cz.eg.hr.data.Version;
+import cz.eg.hr.data.FrameworkVersion;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface VersionRepository extends CrudRepository<Version, Long> {
+public interface FrameworkVersionRepository extends CrudRepository<FrameworkVersion, Long> {
 
-    List<Version> findByFrameworkId(Long id);
+    List<FrameworkVersion> findByFrameworkId(Long id);
 
     @Transactional
     void deleteByFrameworkId(Long id);

@@ -3,6 +3,7 @@ package cz.eg.hr.controller;
 import cz.eg.hr.data.JavascriptFramework;
 import cz.eg.hr.repository.JavascriptFrameworkRepository;
 import cz.eg.hr.exception.ResourceNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,14 +47,14 @@ public class JavascriptFrameworkController {
     }
 
     @PostMapping("/frameworks")
-    public ResponseEntity<JavascriptFramework> createFramework(@RequestBody JavascriptFramework framework) {
+    public ResponseEntity<JavascriptFramework> createFramework(@Valid @RequestBody JavascriptFramework framework) {
         JavascriptFramework newFramework = repository
             .save(new JavascriptFramework(framework.getName(), framework.getRating()));
         return new ResponseEntity<>(newFramework, HttpStatus.CREATED);
     }
 
     @PutMapping("/frameworks/{id}")
-    public ResponseEntity<JavascriptFramework> updateFramework(@PathVariable("id") Long id, @RequestBody JavascriptFramework framework) {
+    public ResponseEntity<JavascriptFramework> updateFramework(@PathVariable("id") Long id, @Valid @RequestBody JavascriptFramework framework) {
         JavascriptFramework updatedFramework = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Not found JavascriptFramework with id = " + id));
 

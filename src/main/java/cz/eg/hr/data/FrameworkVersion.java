@@ -2,24 +2,33 @@ package cz.eg.hr.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.sql.Date;
 
 @Entity
-@Table(name = "versions")
+@Table(name = "versions", uniqueConstraints = {@UniqueConstraint(columnNames = {"version_number", "framework_id"})})
 @SequenceGenerator(name="versions_id_seq", initialValue=1)
-public class Version {
+public class FrameworkVersion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="versions_id_seq")
     private Long id;
 
-    @Lob
-    @Column(name = "version_number")
+    /**
+     * The version number of the javascript framework
+     */
+    @NotBlank(message = "The version number of the javascript framework is required.")
+    @Size(max = 30, message = "The version number of the javascript framework must not be longer than 30 characters.")
+    @Column(name = "version_number", nullable = false, length = 30)
     private String versionNumber;
 
+    /**
+     * The date of deprecation of the framework version (the date when the version stopped being supported)
+     */
     @Column(name = "deprecation_date")
     private Date deprecationDate;
 
@@ -28,6 +37,15 @@ public class Version {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private JavascriptFramework framework;
+
+    public FrameworkVersion() {
+    }
+
+    public FrameworkVersion(Long id, String versionNumber, Date deprecationDate) {
+        this.id = id;
+        this.versionNumber = versionNumber;
+        this.deprecationDate = deprecationDate;
+    }
 
     public Long getId() {
         return id;

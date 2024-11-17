@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Date;
 import java.util.List;
@@ -19,24 +20,35 @@ import java.util.List;
 public class GeneralControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Errors> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Errors> handleNotValidException(MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
         List<ValidationError> errorList = result.getFieldErrors().stream()
-            .map(e -> new ValidationError(e.getField(), e.getCode()))
+            .map(e -> new ValidationError(e.getField(), e.getDefaultMessage()))
             .toList();
 
         return ResponseEntity.badRequest().body(new Errors(errorList));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorMessage> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorMessage> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage(
             HttpStatus.NOT_FOUND.value(),
             new Date(),
             ex.getMessage(),
             request.getDescription(false));
 
-        return new ResponseEntity<ErrorMessage>(message, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorMessage> handleTypeMismatchException(MethodArgumentTypeMismatchException ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage(
+            HttpStatus.BAD_REQUEST.value(),
+            new Date(),
+            ex.getMessage(),
+            request.getDescription(false));
+
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
@@ -47,8 +59,7 @@ public class GeneralControllerAdvice {
             ex.getMessage(),
             request.getDescription(false));
 
-        return new ResponseEntity<ErrorMessage>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 
 }
