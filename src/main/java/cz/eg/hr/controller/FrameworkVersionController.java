@@ -2,8 +2,8 @@ package cz.eg.hr.controller;
 
 import cz.eg.hr.data.FrameworkVersion;
 import cz.eg.hr.exception.ResourceNotFoundException;
-import cz.eg.hr.repository.JavascriptFrameworkRepository;
 import cz.eg.hr.repository.FrameworkVersionRepository;
+import cz.eg.hr.repository.JavascriptFrameworkRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ public class FrameworkVersionController {
     }
 
     @GetMapping("/frameworks/{frameworkId}/versions")
-    public ResponseEntity<List<FrameworkVersion>> getVersionsByFrameworkId(@PathVariable(value = "frameworkId") Long frameworkId) {
+    public ResponseEntity<List<FrameworkVersion>> getVersionsByFrameworkId(@PathVariable("frameworkId") Long frameworkId) {
         if (!frameworkRepository.existsById(frameworkId)) {
             throw new ResourceNotFoundException("Not found JavascriptFramework with id = " + frameworkId);
         }
@@ -37,15 +37,15 @@ public class FrameworkVersionController {
     }
 
     @GetMapping("/versions/{id}")
-    public ResponseEntity<FrameworkVersion> getVersionById(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<FrameworkVersion> getVersionById(@PathVariable("id") Long id) {
         FrameworkVersion version = versionRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Not found Version with id = " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Not found FrameworkVersion with id = " + id));
 
         return new ResponseEntity<>(version, HttpStatus.OK);
     }
 
     @PostMapping("/frameworks/{frameworkId}/versions")
-    public ResponseEntity<FrameworkVersion> createVersion(@PathVariable(value = "frameworkId") Long frameworkId,
+    public ResponseEntity<FrameworkVersion> createVersionByFrameworkId(@PathVariable("frameworkId") Long frameworkId,
                                                  @Valid @RequestBody FrameworkVersion versionRequest) {
         FrameworkVersion version = frameworkRepository.findById(frameworkId).map(framework -> {
             versionRequest.setFramework(framework);
@@ -56,9 +56,9 @@ public class FrameworkVersionController {
     }
 
     @PutMapping("/versions/{id}")
-    public ResponseEntity<FrameworkVersion> updateVersion(@PathVariable("id") Long id, @Valid @RequestBody FrameworkVersion versionRequest) {
+    public ResponseEntity<FrameworkVersion> updateVersionById(@PathVariable("id") Long id, @Valid @RequestBody FrameworkVersion versionRequest) {
         FrameworkVersion version = versionRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("VersionId " + id + "not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Not found FrameworkVersion with id = " + id));
 
         version.setVersionNumber(versionRequest.getVersionNumber());
         version.setDeprecationDate(versionRequest.getDeprecationDate());
@@ -66,18 +66,22 @@ public class FrameworkVersionController {
     }
 
     @DeleteMapping("/versions/{id}")
-    public ResponseEntity<HttpStatus> deleteVersion(@PathVariable("id") Long id) {
+    public ResponseEntity<HttpStatus> deleteVersionById(@PathVariable("id") Long id) {
+        if (!versionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Not found FrameworkVersion with id = " + id);
+        }
+
         versionRepository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/frameworks/{frameworkId}/versions")
-    public ResponseEntity<List<FrameworkVersion>> deleteAllVersionsOfFramework(@PathVariable(value = "frameworkId") Long frameworkId) {
+    public ResponseEntity<List<FrameworkVersion>> deleteVersionsByFrameworkId(@PathVariable("frameworkId") Long frameworkId) {
         if (!frameworkRepository.existsById(frameworkId)) {
             throw new ResourceNotFoundException("Not found JavascriptFramework with id = " + frameworkId);
         }
 
         versionRepository.deleteByFrameworkId(frameworkId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

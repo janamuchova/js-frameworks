@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface JavascriptFrameworkRepository extends CrudRepository<JavascriptFramework, Long> {
 
-    List<JavascriptFramework> findAllByNameContaining(String name);
+    List<JavascriptFramework> findByNameContaining(String name);
 }

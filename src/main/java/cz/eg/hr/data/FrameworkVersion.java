@@ -10,7 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.sql.Date;
 
 @Entity
-@Table(name = "versions", uniqueConstraints = {@UniqueConstraint(columnNames = {"version_number", "framework_id"})})
+@Table(name = "versions", uniqueConstraints = {@UniqueConstraint(columnNames = {"framework_id", "version_number"})})
 @SequenceGenerator(name="versions_id_seq", initialValue=1)
 public class FrameworkVersion {
 

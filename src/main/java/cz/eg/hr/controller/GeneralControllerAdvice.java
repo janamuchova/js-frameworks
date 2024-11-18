@@ -4,6 +4,7 @@ import cz.eg.hr.exception.ErrorMessage;
 import cz.eg.hr.exception.Errors;
 import cz.eg.hr.exception.ResourceNotFoundException;
 import cz.eg.hr.exception.ValidationError;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -38,6 +39,17 @@ public class GeneralControllerAdvice {
             request.getDescription(false));
 
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorMessage> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage(
+            HttpStatus.CONFLICT.value(),
+            new Date(),
+            ex.getMostSpecificCause().getMessage(),
+            request.getDescription(false));
+
+        return new ResponseEntity<>(message, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

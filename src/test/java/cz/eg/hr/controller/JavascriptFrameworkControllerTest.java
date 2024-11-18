@@ -20,8 +20,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -91,7 +91,7 @@ class JavascriptFrameworkControllerTest {
 
         List<JavascriptFramework> frameworks = Collections.emptyList();
 
-        when(frameworkRepository.findAllByNameContaining(name)).thenReturn(frameworks);
+        when(frameworkRepository.findByNameContaining(name)).thenReturn(frameworks);
         mockMvc.perform(get("/frameworks").params(paramsMap))
             .andExpect(status().isNoContent())
             .andDo(print());
@@ -136,7 +136,7 @@ class JavascriptFrameworkControllerTest {
 
         doNothing().when(frameworkRepository).deleteById(id);
         mockMvc.perform(delete("/frameworks/{id}", id))
-            .andExpect(status().isNoContent())
+            .andExpect(status().isNotFound())
             .andDo(print());
     }
 

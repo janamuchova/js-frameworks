@@ -1,8 +1,8 @@
 package cz.eg.hr.controller;
 
 import cz.eg.hr.data.JavascriptFramework;
-import cz.eg.hr.repository.JavascriptFrameworkRepository;
 import cz.eg.hr.exception.ResourceNotFoundException;
+import cz.eg.hr.repository.JavascriptFrameworkRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ public class JavascriptFrameworkController {
         if (name == null)
             repository.findAll().forEach(frameworks::add);
         else
-            frameworks.addAll(repository.findAllByNameContaining(name));
+            frameworks.addAll(repository.findByNameContaining(name));
 
         if (frameworks.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -54,7 +54,7 @@ public class JavascriptFrameworkController {
     }
 
     @PutMapping("/frameworks/{id}")
-    public ResponseEntity<JavascriptFramework> updateFramework(@PathVariable("id") Long id, @Valid @RequestBody JavascriptFramework framework) {
+    public ResponseEntity<JavascriptFramework> updateFrameworkById(@PathVariable("id") Long id, @Valid @RequestBody JavascriptFramework framework) {
         JavascriptFramework updatedFramework = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Not found JavascriptFramework with id = " + id));
 
@@ -64,9 +64,13 @@ public class JavascriptFrameworkController {
     }
 
     @DeleteMapping("/frameworks/{id}")
-    private ResponseEntity<HttpStatus> deleteFramework(@PathVariable("id") Long id) {
+    private ResponseEntity<HttpStatus> deleteFrameworkById(@PathVariable("id") Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Not found JavascriptFramework with id = " + id);
+        }
+
         repository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
